@@ -1,25 +1,37 @@
-import React from 'react';
-import logo from './logo.svg';
+import React, {useEffect, useState} from 'react';
 import './App.css';
-
+import {Routes, Route, BrowserRouter} from 'react-router-dom';
+import Main from './routes/main';
 function App() {
+  const [account, setAccount] = useState<string>("");
+  const getAccount = async () => {
+    try {
+
+      // 메타마스크가 설치되어있는지 확인
+      if (window.ethereum) {
+        const accounts = await window.ethereum.request({
+          method: 'eth_requestAccounts',
+        });
+
+        setAccount(accounts[0]);
+      } else {
+        alert("Install Metamask");
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  useEffect(() => {
+    getAccount();
+  }, []);
+  
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<Main account={account}/>} />
+      </Routes>
+  </BrowserRouter>
   );
 }
 
